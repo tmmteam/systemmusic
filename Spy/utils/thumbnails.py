@@ -13,8 +13,6 @@ from Spy import app
 from config import YOUTUBE_IMG_URL
 
 
-
-# Existing Helper Functions from Your File
 def changeImageSize(maxWidth, maxHeight, image):
     widthRatio = maxWidth / image.size[0]
     heightRatio = maxHeight / image.size[1]
@@ -22,6 +20,7 @@ def changeImageSize(maxWidth, maxHeight, image):
     newHeight = int(heightRatio * image.size[1])
     newImage = image.resize((newWidth, newHeight))
     return newImage
+
 
 def clear(text):
     list = text.split(" ")
@@ -31,30 +30,10 @@ def clear(text):
             title += " " + i
     return title.strip()
 
+
 def get_random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255)
 
-# New Functionality: Adding Circle Profile and Rectangle Thumbnail
-def add_circle_profile(background, profile_path, position, circle_size):
-    profile = Image.open(profile_path)
-
-    # Create circular mask for the profile picture
-    mask = Image.new("L", profile.size, 0)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0, profile.size[0], profile.size[1]), fill=255)
-    profile_circle = ImageOps.fit(profile, mask.size, centering=(0.5, 0.5))
-    profile_circle.putalpha(mask)
-
-    # Resize and paste profile circle on background
-    profile_circle = profile_circle.resize(circle_size, Image.ANTIALIAS)
-    background.paste(profile_circle, position, profile_circle)
-    return background
-
-def add_video_thumbnail(background, thumbnail_path, position, size):
-    thumbnail = Image.open(thumbnail_path)
-    thumbnail = thumbnail.resize(size)
-    background.paste(thumbnail, position)
-    return background
 
 async def get_thumb(videoid):
     if os.path.isfile(f"cache/{videoid}.png"):
@@ -185,12 +164,3 @@ async def get_thumb(videoid):
     except Exception as e:
         print(e)
         return YOUTUBE_IMG_URL
-
-# Example of Adding Circle Profile and Video Thumbnail
-def create_custom_thumbnail(background_path, video_thumbnail_path, profile_path, output_path):
-    background = Image.open(background_path)
-    background = add_video_thumbnail(background, video_thumbnail_path, (600, 200), (500, 250))  # Adjust position
-    background = add_circle_profile(background, profile_path, (100, 150), (150, 150))  # Adjust position
-    background.save(output_path)
-    print(f"Custom thumbnail saved as {output_path}")
-
